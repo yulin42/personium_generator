@@ -1,37 +1,37 @@
 //
-//  FeedView.swift
+//  FavoritesView.swift
 //  personium
 //
 
 import SwiftUI
 
-struct FeedView: View {
-    @State private var viewModel: FeedViewModel
+struct FavoritesView: View {
+    @State private var viewModel: FavoritesViewModel
 
-    init(viewModel: FeedViewModel = FeedViewModel()) {
+    init(viewModel: FavoritesViewModel = FavoritesViewModel()) {
         _viewModel = State(initialValue: viewModel)
     }
 
     var body: some View {
         NavigationStack {
             Group {
-                if viewModel.posts.isEmpty {
+                if viewModel.favoritePosts.isEmpty {
                     emptyState
                 } else {
-                    feedList
+                    favoritesList
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Murmur")
+            .navigationTitle("Favorites")
             .navigationBarTitleDisplayMode(.large)
         }
     }
 
-    private var feedList: some View {
+    private var favoritesList: some View {
         ScrollView {
             LazyVStack(spacing: 28) {
-                ForEach(viewModel.posts) { post in
+                ForEach(viewModel.favoritePosts) { post in
                     PostCard(
                         post: post,
                         onFavoriteTap: { viewModel.toggleFavorite(for: post.id) }
@@ -46,11 +46,11 @@ struct FeedView: View {
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Text("No posts yet")
+            Text("No favorites yet")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text("Generate your first batch of thoughts.")
+            Text("Save posts you want to revisit.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -62,15 +62,15 @@ struct FeedView: View {
 
 // MARK: - Previews
 
-#Preview("Feed") {
-    FeedView(viewModel: .preview)
+#Preview("Favorites") {
+    FavoritesView(viewModel: .preview)
 }
 
 #Preview("Empty") {
-    FeedView(viewModel: .empty)
+    FavoritesView(viewModel: .empty)
 }
 
 #Preview("Dynamic Type") {
-    FeedView(viewModel: .preview)
+    FavoritesView(viewModel: .preview)
         .dynamicTypeSize(.accessibility3)
 }
