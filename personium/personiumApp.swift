@@ -5,14 +5,15 @@
 //  Created by Yulin Feng on 2026-05-22.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct personiumApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Post.self,
+            Batch.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +26,7 @@ struct personiumApp: App {
 
     var body: some Scene {
         WindowGroup {
-            FeedView()
+            MainTabView()
         }
         .modelContainer(sharedModelContainer)
     }

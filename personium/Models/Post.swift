@@ -4,22 +4,28 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Post: Identifiable, Equatable, Hashable {
-    let id: UUID
+@Model
+final class Post {
+    var id: UUID
     var text: String
-    let createdAt: Date
+    var createdAt: Date
     var isFavorite: Bool
+
+    var batch: Batch?
 
     init(
         id: UUID = UUID(),
         text: String,
-        createdAt: Date = Date(),
-        isFavorite: Bool = false
+        createdAt: Date = .now,
+        isFavorite: Bool = false,
+        batch: Batch? = nil
     ) {
         self.id = id
         self.text = text
         self.createdAt = createdAt
         self.isFavorite = isFavorite
+        self.batch = batch
     }
 }
