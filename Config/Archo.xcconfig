@@ -1,0 +1,10 @@
+// Base configuration for the Archo app target.
+//
+// The OpenAI key is never committed. Copy Secrets.example.xcconfig to
+// Secrets.xcconfig and fill in your key; the optional include below is
+// silently skipped when that file is absent, and Archo then runs with
+// generation disabled instead of failing to build.
+
+OPENAI_API_KEY =
+
+#include? "Secrets.xcconfig"
