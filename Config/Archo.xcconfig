@@ -1,10 +1,14 @@
 // Base configuration for the Archo app target.
 //
-// The OpenAI key is never committed. Copy Secrets.example.xcconfig to
+// The OpenRouter key is never committed. Copy Secrets.example.xcconfig to
 // Secrets.xcconfig and fill in your key; the optional include below is
 // silently skipped when that file is absent, and Archo then runs with
 // generation disabled instead of failing to build.
+//
+// OPENROUTER_MODEL is an OpenRouter slug. Override it in Secrets.xcconfig
+// without changing the committed default.
 
-OPENAI_API_KEY =
+OPENROUTER_API_KEY =
+OPENROUTER_MODEL = deepseek/deepseek-v4-flash-0731
 
 #include? "Secrets.xcconfig"

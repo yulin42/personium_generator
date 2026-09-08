@@ -11,9 +11,9 @@ final class GenerateViewModel {
     private(set) var isGenerating = false
     private(set) var errorMessage: String?
 
-    private let service: OpenAIService
+    private let service: AIService
 
-    init(service: OpenAIService = OpenAIService()) {
+    init(service: AIService = AIService()) {
         self.service = service
     }
 

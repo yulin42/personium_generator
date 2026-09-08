@@ -8,7 +8,7 @@ enum GenerationError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            "Add an OpenAI API key in Config/Secrets.xcconfig to generate posts."
+            "Add an OpenRouter API key in Config/Secrets.xcconfig to generate posts."
         case .offline:
             "You appear to be offline. Check your connection and try again."
         case .failed:
@@ -17,17 +17,24 @@ enum GenerationError: Error, LocalizedError, Equatable {
     }
 }
 
-/// Turns a topic into a list of short posts. The caller decides what to do
-/// with the strings; this type knows nothing about SwiftData or SwiftUI.
-nonisolated struct OpenAIService {
+/// Turns a topic into a list of short posts via OpenRouter. The caller decides
+/// what to do with the strings; this type knows nothing about SwiftData or SwiftUI.
+nonisolated struct AIService {
     private let apiKey: String?
+    private let model: String
     private let session: URLSession
 
-    private static let endpoint = URL(string: "https://api.openai.com/v1/chat/completions")!
-    private static let model = "gpt-4o-mini"
+    private static let endpoint = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
+    private static let appURL = "https://archo.app"
+    private static let appTitle = "Archo"
 
-    init(apiKey: String? = AppConfiguration.openAIAPIKey, session: URLSession = .shared) {
+    init(
+        apiKey: String? = AppConfiguration.openRouterAPIKey,
+        model: String = AppConfiguration.openRouterModel,
+        session: URLSession = .shared
+    ) {
         self.apiKey = apiKey
+        self.model = model
         self.session = session
     }
 
@@ -39,6 +46,8 @@ nonisolated struct OpenAIService {
         request.timeoutInterval = 90
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(Self.appURL, forHTTPHeaderField: "HTTP-Referer")
+        request.setValue(Self.appTitle, forHTTPHeaderField: "X-OpenRouter-Title")
         request.httpBody = try? JSONSerialization.data(withJSONObject: requestBody(category: category, count: count))
 
         guard request.httpBody != nil else { throw GenerationError.failed }
@@ -71,10 +80,10 @@ nonisolated struct OpenAIService {
 
 // MARK: - Request
 
-private nonisolated extension OpenAIService {
+private nonisolated extension AIService {
     func requestBody(category: String, count: Int) -> [String: Any] {
         [
-            "model": Self.model,
+            "model": model,
             "temperature": 1.0,
             "messages": [
                 ["role": "system", "content": Self.systemPrompt],
@@ -101,6 +110,10 @@ private nonisolated extension OpenAIService {
                     ],
                 ],
             ],
+            // Prefer providers that actually honor `response_format`.
+            "provider": [
+                "require_parameters": true,
+            ],
         ]
     }
 
@@ -121,7 +134,7 @@ private nonisolated extension OpenAIService {
 
 // MARK: - Response
 
-nonisolated extension OpenAIService {
+nonisolated extension AIService {
     struct ChatCompletion: Decodable {
         struct Choice: Decodable {
             struct Message: Decodable {

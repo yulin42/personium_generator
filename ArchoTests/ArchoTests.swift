@@ -5,7 +5,7 @@ import Testing
 
 struct GenerationErrorTests {
     @Test func missingKeyIsReportedBeforeAnyRequest() async throws {
-        let service = OpenAIService(apiKey: nil)
+        let service = AIService(apiKey: nil)
 
         await #expect(throws: GenerationError.missingAPIKey) {
             try await service.generatePosts(category: "Focus", count: 10)
@@ -30,14 +30,14 @@ struct ResponseDecodingTests {
     @Test func decodesPosts() {
         let data = completion(posts: ["One quiet thought.", "Another one."])
 
-        #expect(OpenAIService.decodePosts(from: data) == ["One quiet thought.", "Another one."])
+        #expect(AIService.decodePosts(from: data) == ["One quiet thought.", "Another one."])
     }
 
     @Test func stripsListMarkersAndWrappingQuotes() {
         let data = completion(posts: ["- A bulleted thought.", "2. A numbered thought.", "\"A quoted thought.\""])
 
         #expect(
-            OpenAIService.decodePosts(from: data) == [
+            AIService.decodePosts(from: data) == [
                 "A bulleted thought.",
                 "A numbered thought.",
                 "A quoted thought.",
@@ -48,17 +48,17 @@ struct ResponseDecodingTests {
     @Test func dropsDuplicatesAndBlanks() {
         let data = completion(posts: ["Same thought.", "same thought.", "  ", ""])
 
-        #expect(OpenAIService.decodePosts(from: data) == ["Same thought."])
+        #expect(AIService.decodePosts(from: data) == ["Same thought."])
     }
 
     @Test func returnsNothingForEmptyOrInvalidResponses() {
-        #expect(OpenAIService.decodePosts(from: completion(posts: [])).isEmpty)
-        #expect(OpenAIService.decodePosts(from: Data("not json".utf8)).isEmpty)
+        #expect(AIService.decodePosts(from: completion(posts: [])).isEmpty)
+        #expect(AIService.decodePosts(from: Data("not json".utf8)).isEmpty)
 
         let unparsableContent = try! JSONSerialization.data(
             withJSONObject: ["choices": [["message": ["content": "sorry, I can't help"]]]]
         )
-        #expect(OpenAIService.decodePosts(from: unparsableContent).isEmpty)
+        #expect(AIService.decodePosts(from: unparsableContent).isEmpty)
     }
 }
 
